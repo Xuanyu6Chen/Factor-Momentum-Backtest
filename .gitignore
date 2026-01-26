@@ -1,0 +1,15 @@
+# Virtual environment (never commit)
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# macOS junk
+.DS_Store
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Local data cache (downloaded prices etc.)
+data/
