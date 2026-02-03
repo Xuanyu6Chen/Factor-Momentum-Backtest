@@ -13,3 +13,4 @@ __pycache__/
 
 # Local data cache (downloaded prices etc.)
 Data/
+Results/
