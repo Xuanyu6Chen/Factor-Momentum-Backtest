@@ -3,6 +3,8 @@ from .data_clean import main as clean_main
 from .returns import main as returns_main
 from .signals.momentum_12_1 import main as mom_main
 from .portfolio import main as portfolio_main
+from .backtest import main as backtest_main
+
 
 def main():
     fetch_main()
@@ -10,6 +12,7 @@ def main():
     returns_main()
     mom_main()
     portfolio_main()
+    backtest_main()
     print("Pipeline complete ✅")
 
 if __name__ == "__main__":
