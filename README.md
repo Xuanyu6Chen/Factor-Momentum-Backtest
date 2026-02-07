@@ -45,7 +45,25 @@ So if 10 tickers are selected, each gets weight:
 ### Holding period
 - Hold these weights until the next month-end rebalance.
 
+## Project Pipeline
+**Produce the core market tables (Prices and Returns):**
+1) Download prices for tickers — `Src/factor_momentum/data_fetch.py`  
+2) Clean prices into a daily panel — `Src/factor_momentum/data_clean.py`  
+3) Compute daily returns — `Src/factor_momentum/returns.py`  
 
+**Compute the signal from prices (using only past data):**
+4) Compute 12–1 momentum scores at each rebalance date — `Src/factor_momentum/signals/momentum_12_1.py`  
+
+**Convert signal into a tradeable portfolio:**
+5) Convert momentum scores to long-only, normalized portfolio weights (rebalance-date weights) — `Src/factor_momentum/portfolio.py`  
+
+**Run the backtest (no look-ahead):**
+6) Align rebalance-date weights to the daily trading calendar and apply starting the next trading day — `Src/factor_momentum/backtest.py`  
+7) Compute daily **gross** portfolio returns from daily weights and asset returns — `Src/factor_momentum/backtest.py`  
+
+**Apply trading frictions and report results:**
+8) Compute turnover and subtract transaction costs to obtain **net** returns — `Src/factor_momentum/costs.py` + `Src/factor_momentum/backtest.py`  
+9) Evaluate performance (equity curve, metrics) and save outputs — `Src/factor_momentum/evaluate.py`
 
 ## Repo Structure
 - `Src/factor_momentum/` — core pipeline and strategy code
