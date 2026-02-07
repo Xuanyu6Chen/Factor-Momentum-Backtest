@@ -16,10 +16,10 @@ The goal is to learn (and demonstrate) how to:
 For each stock $i$ at rebalance date $t$,
 
 $$
-\text{Momentum}_{t} = \frac{P_{t-1}}{P_{t-12}} - 1
+\text{Momentum}_{i,t} = \frac{P_{i,t-1}}{P_{i,t-12}} - 1
 $$
 
-where $P_{t-1}$ is the price one month before $t$ and $P_{t-12}$ is the price twelve months before $t$.
+where $P_{i,t-1}$ is the price one month before $t$ and $P_{i,t-12}$ is the price twelve months before $t$.
 
 ## Strategy Definition
 ### Universe
