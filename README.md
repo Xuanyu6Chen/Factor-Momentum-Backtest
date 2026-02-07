@@ -1,33 +1,51 @@
 # Factor Momentum Backtest (12–1 Momentum, Long-Only)
 
 ## Overview
-This project backtests a simple cross-sectional momentum strategy using daily price data. Each month-end, it ranks stocks by 12–1 momentum (past 12 months return excluding the most recent month), forms a long-only portfolio, and holds it until the next rebalance. The backtest includes turnover-based transaction costs and outputs daily returns and an equity curve.
+This project builds a small, reproducible “quant research” pipeline that tests a classic trading signal — **momentum** — on historical US stock data. Each month-end, it ranks stocks by 12–1 momentum (past 12 months return excluding the most recent month), forms a long-only portfolio, and holds it until the next rebalance. The backtest includes turnover-based transaction costs and outputs daily returns and an equity curve.
+
+The goal is to learn (and demonstrate) how to:
+- turn an idea into a precise trading rule,
+- simulate it fairly on historical data (a backtest),
+- and evaluate results using standard return + risk metrics.
+
+**Signal (12–1 momentum) meaning:** 
+- Look back **12 months**
+- Skip the most recent **1 month**
+- Use the return from **t−12 months to t−1 month** as the momentum score
+
+For each stock $i$ at rebalance date $t$,
+
+$$
+\text{Momentum}_{t} = \frac{P_{t-1}}{P_{t-12}} - 1
+$$
+
+where $P_{t-1}$ is the price one month before $t$ and $P_{t-12}$ is the price twelve months before $t$.
 
 ## Strategy Definition
+### Universe
+- A fixed list of **50 large-cap US tickers**.
+- The universe is kept fixed to make the experiment clear and reproducible.
 
-**Signal (12–1 momentum):** For each stock $i$ at rebalance date $t$,
+### Rebalancing schedule
+- **Monthly** rebalancing using month-end dates.
 
-$$
-\mathrm{MOM}_{i,t}=\frac{P_{i,t-1m}}{P_{i,t-12m}}-1
-$$
+### Signal
+- For each ticker at each month-end: compute the **12–1 momentum** score.
 
-where $P_{i,t-1m}$ is the price one month before $t$ and $P_{i,t-12m}$ is the price twelve months before $t$.
+### Portfolio construction (long-only)
+At each rebalance:
+1. Rank the 50 tickers by their momentum score (highest to lowest).
+2. Select the **top 10** tickers (top 20%).
+3. Allocate weights **equally** across the selected tickers.
 
-**Portfolio:**
-- Long-only
-- Rebalanced at month-end
-- Weights normalized to sum to 1 across selected stocks
+So if 10 tickers are selected, each gets weight:
+- 10% per ticker
+- weights sum to 1.0 (100% invested)
 
-## Backtest Methodology
-- **No look-ahead:** weights are computed using information available up to the rebalance date, then applied starting from the next trading day.
+### Holding period
+- Hold these weights until the next month-end rebalance.
 
-**Daily portfolio return:**
 
-$$
-r_{p,t}=\sum_i w_{i,t}\,r_{i,t}
-$$
-
-- **Transaction costs:** modeled as a function of turnover at rebalances (details in the costs module).
 
 ## Repo Structure
 - `Src/factor_momentum/` — core pipeline and strategy code
