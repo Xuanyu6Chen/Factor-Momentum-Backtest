@@ -28,8 +28,8 @@ def main():
     level0 = df.columns.get_level_values(0)
     print("Fields returned:", sorted(set(level0)))
 
-    if "Adj Close" not in set(level0):
-        # Stop here so it’s obvious what yfinance is returning on your machine
+    if "Adj Close" not in set(level0): 
+        #Stop when Adj close could not be found
         raise KeyError("Adj Close not found. See printed 'Fields returned' above.")
 
     prices = df["Adj Close"]
