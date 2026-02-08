@@ -8,10 +8,11 @@ TICKERS = [
 ]
 # The earliest date to fetch
 START_DATE = "2016-01-01"
-
 END_DATE = None
+
 #path to store the raw data 
 DATA_DIR_RAW = "Data/Raw"
+
 #path to store the processed data 
 DATA_DIR_PROCESSED = "Data/Processed"
 
