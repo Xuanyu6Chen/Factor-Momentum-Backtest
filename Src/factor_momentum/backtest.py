@@ -1,15 +1,3 @@
-"""
-backtest.py
-
-Part 6: Transaction costs + turnover
-
-Assumptions:
-- weights_rebal contains target portfolio weights at month-end rebalance dates.
-- Those weights become effective on the NEXT trading day after the rebalance date.
-- Daily portfolio return uses yesterday's weights:
-    gross_ret[t] = sum_i w[t-1,i] * r[t,i]
-- Transaction costs are paid on rebalance days at the close, so they reduce wealth before the next day.
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -28,7 +16,6 @@ from .config import (
     EQUITY_CURVE_FILE,
     META_FILE,
 )
-
 
 @dataclass(frozen=True)
 class BacktestInputs:
