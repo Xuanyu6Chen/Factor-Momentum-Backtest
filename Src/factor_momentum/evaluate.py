@@ -1,4 +1,3 @@
-# Src/factor_momentum/evaluate.py
 from __future__ import annotations
 
 from pathlib import Path
@@ -12,7 +11,6 @@ from .config import RESULTS_DIR, COST_BPS_GRID
 def infer_ann_factor(dt_index: pd.DatetimeIndex) -> int:
     """
     Best-effort inference of annualization factor.
-    If you're using daily returns (most likely in this backtest output), it should be ~252.
     """
     if len(dt_index) < 3:
         return 252  # safer default for daily series
@@ -24,14 +22,14 @@ def infer_ann_factor(dt_index: pd.DatetimeIndex) -> int:
         return 252
     return 52
 
-
+# Equity returns 
 def returns_to_equity(returns: pd.Series, start_value: float = 1.0) -> pd.Series:
     r = returns.dropna().astype(float)
     equity = (1.0 + r).cumprod() * start_value
     equity.name = "equity"
     return equity
 
-
+# Drawdown 
 def compute_drawdown(equity: pd.Series) -> pd.Series:
     eq = equity.dropna().astype(float)
     peak = eq.cummax()
@@ -45,25 +43,84 @@ def compute_metrics(
     rf_annual: float = 0.0,
     ann_factor: int | None = None,
 ) -> dict:
+    
+    '''''
+    1) Clean and validate the return series
+       - drop NaNs (missing returns)
+       - force float type (avoid object dtype problems)
+       - if nothing remains, metrics are meaningless -> raise an error
+    '''''
     r = returns.dropna().astype(float)
     if r.empty:
         raise ValueError("returns series is empty after dropping NaNs")
 
+    '''''
+    2) Decide how to annualize (daily vs monthly vs weekly)
+       ann_factor A controls scaling:
+         - CAGR uses exponent A/n
+         - annual_vol multiplies by sqrt(A)
+         - Sharpe multiplies by sqrt(A) (equivalently)
+    '''''
     if ann_factor is None:
         ann_factor = infer_ann_factor(pd.DatetimeIndex(r.index))
 
+    '''''
+    3) Convert returns into an equity curve (portfolio value path)
+       If E_0 = 1, then:
+         E_t = E_0 * Π_{i=1..t} (1 + r_i)
+       This is compounding.
+    '''''
     equity = returns_to_equity(r, start_value=1.0)
+    
+    '''''
+    4) Compute drawdown series from equity
+       peak_t = max_{s<=t} E_s
+       drawdown_t = E_t / peak_t - 1
+       max_drawdown is the minimum drawdown (most negative point).
+    '''''
     dd = compute_drawdown(equity)
 
+    '''''
+    5) Basic bookkeeping
+       n = number of return observations (periods)
+       total_return = E_T / E_0 - 1
+    '''''
     n = len(r)
     total_return = equity.iloc[-1] / equity.iloc[0] - 1.0
 
-    # CAGR
+    '''''
+    6) CAGR (Compound Annual Growth Rate)
+       We want the constant annual growth rate that would turn E_0 into E_T.
+
+       Years covered ≈ n / A
+       So:
+         CAGR = (E_T / E_0)^(1 / years) - 1
+              = (E_T / E_0)^(A / n) - 1
+    '''''
     cagr = (equity.iloc[-1] / equity.iloc[0]) ** (ann_factor / n) - 1.0
 
-    # Vol & Sharpe
+    '''''
+    7) Annualized volatility
+       std(r) is per-period volatility.
+       Under common assumptions, volatility scales with sqrt(time):
+         vol_ann = std(r) * sqrt(A)
+    '''''
     vol_ann = r.std(ddof=1) * np.sqrt(ann_factor)
 
+    '''''
+    8) Sharpe ratio (annualized)
+       Risk-free conversion:
+         rf_per_period = rf_annual / A   (simple approximation)
+
+       Excess returns:
+         x_t = r_t - rf_per_period
+
+       Annualized Sharpe (one common form):
+         Sharpe = (mean(x) * A) / (std(x) * sqrt(A))
+                = (mean(x) / std(x)) * sqrt(A)
+
+       We guard against division by zero when std is 0.
+    '''''
     rf_per_period = rf_annual / ann_factor
     excess = r - rf_per_period
     denom = excess.std(ddof=1)
@@ -72,6 +129,10 @@ def compute_metrics(
     if denom > 0:
         sharpe = (excess.mean() * ann_factor) / (denom * np.sqrt(ann_factor))
 
+    '''''
+    9) Max drawdown
+       dd is ≤ 0 everywhere. The most negative value is the worst peak-to-trough decline.
+    '''''
     max_dd = dd.min()
 
     return {
@@ -110,7 +171,7 @@ def _load_strategy_returns(run_dir: Path) -> pd.Series:
     s.name = "strategy_return"
     return s
 
-
+# Plot the equity 
 def plot_equity_cost_grid(equity_map: dict[int, pd.Series], out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     plt.figure()
@@ -126,7 +187,7 @@ def plot_equity_cost_grid(equity_map: dict[int, pd.Series], out_path: Path) -> N
     plt.savefig(out_path, dpi=200)
     plt.close()
 
-
+# Plot the drawdown 
 def plot_drawdown_cost_grid(dd_map: dict[int, pd.Series], out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     plt.figure()
