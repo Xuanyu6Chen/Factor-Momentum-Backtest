@@ -77,7 +77,10 @@ So if 10 tickers are selected, each gets weight:
 - `Results/` — backtest outputs (ignored by default)
 - `Results/assets/` — lightweight, committed sample artifacts (plots / summary tables)
 
-## How to Run
+## :computer: How to Run
+
+## 💻 How to Run
+
 
 ### 1) Clone the repo and open the project
 ```bash
