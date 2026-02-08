@@ -4,7 +4,7 @@ import pandas as pd
 from .config import DATA_DIR_PROCESSED
 
 def main():
-    # 1) Load processed prices (cleaned)
+    # 1) Load cleaned processed prices from result of data_clean.py 
     prices = pd.read_parquet(f"{DATA_DIR_PROCESSED}/prices.parquet")
 
     # 2) Make sure dates are datetime + sorted
