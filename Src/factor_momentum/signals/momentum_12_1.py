@@ -11,12 +11,12 @@ class SignalPaths:
     out_scores_path: Path = Path("Data/Processed/mom12_1_scores.parquet")
     out_monthly_prices_path: Path = Path("Data/Processed/prices_month_end.parquet")
 
-#loading the daily price table
-def load_prices_wide(path: Path) -> pd.DataFrame:
+# loading the daily price table
+def load_prices_wide(path: Path) -> pd.DataFrame: # -> is a return type hint - it will return as a dataframe 
     df = pd.read_parquet(path)
     if not isinstance(df.index, pd.DatetimeIndex):
         df.index = pd.to_datetime(df.index)
-    df = df.sort_index()
+    df = df.sort_index() # sort by date 
 
     # optional: drop duplicate dates if any
     df = df[~df.index.duplicated(keep="last")]
@@ -28,10 +28,12 @@ def make_month_end_prices(daily_prices: pd.DataFrame) -> pd.DataFrame:
     Month-end prices derived from daily prices (last available trading day each month).
     Index will be calendar month-end timestamps produced by resample('M').
     """
-    month_end = daily_prices.resample("ME").last()
+    # Resample groups the daily rows into monthly buckets - ME=Month End
+    # last() takes the last row within each monthly buckets
+    month_end = daily_prices.resample("ME").last() 
     return month_end
 
-
+# computing mom
 def momentum_12_1(month_end_prices: pd.DataFrame) -> pd.DataFrame:
     """
     12–1 momentum at month-end t:
