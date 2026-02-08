@@ -68,7 +68,7 @@ def compute_turnover_and_costs(
             continue
         w_pre = (w_prev.fillna(0.0) * (1.0 + r_t)) / denom
 
-        # new target weights at t
+        # new target weights at t 
         w_tgt = w.loc[t].fillna(0.0)
 
         turnover.loc[t] = 0.5 * float((w_tgt - w_pre).abs().sum())
