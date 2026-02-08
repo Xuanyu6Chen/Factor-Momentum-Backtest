@@ -13,4 +13,9 @@ __pycache__/
 
 # Local data cache (downloaded prices etc.)
 Data/
-Results/
+
+# Ignore everything in Results
+Results/*
+# …except the assets folder
+!Results/assets/
+!Results/assets/**
