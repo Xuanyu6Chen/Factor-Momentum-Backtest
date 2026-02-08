@@ -81,7 +81,7 @@ So if 10 tickers are selected, each gets weight:
 
 ### 1) Clone the repo and open the project
 ```bash
-git clone <YOUR_REPO_URL>
+git clone <REPO_URL>
 cd Factor-Momentum-Backtest
 ```
 
@@ -105,8 +105,9 @@ Src/factor_momentum/config.py
 Common things to change:
 - TICKERS (stock universe)
 - COST_BPS_GRID (e.g., [0, 10, 50])
-- RESULTS_DIR 
+- RESULTS_DIR (where results are saved)
 
 ### 5) Run the full pipeline (end-to-end)
 ```bash
 PYTHONPATH=Src python -m factor_momentum.pipeline
+```
