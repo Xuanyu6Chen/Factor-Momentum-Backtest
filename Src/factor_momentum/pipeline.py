@@ -11,15 +11,20 @@ from .portfolio import main as portfolio_main
 
 
 def main() -> None:
+    """
+    End-to-end pipeline:
+    fetch -> clean -> returns -> signal -> weights -> backtest.
+    Runs a simple transaction-cost sensitivity grid over COST_BPS_GRID.
+    """
     fetch_main()
     clean_main()
     returns_main()
     signal_main()
     portfolio_main()
 
-    # 2) Robustness: run backtest under different trading costs
     for bps in COST_BPS_GRID:
         out_dir = Path(RESULTS_DIR) / f"cost_{bps}bps"
+        out_dir.mkdir(parents=True, exist_ok=True)
         run_backtest(cost_bps=bps, out_dir=out_dir)
 
 
