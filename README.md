@@ -83,23 +83,25 @@ So if 10 tickers are selected, each gets weight:
 ```bash
 git clone <YOUR_REPO_URL>
 cd Factor-Momentum-Backtest
+```
 
 ### 2) Create and activate a virtual environment
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
+```
 
 ### 3) Install dependencies
 ```bash
 pip install -r requirements.txt
+```
 
 ### 4) Configure the experiment
 Edit:
 ```bash
 Src/factor_momentum/config.py
 ```
-
 Common things to change:
 - TICKERS (stock universe)
 - COST_BPS_GRID (e.g., [0, 10, 50])
