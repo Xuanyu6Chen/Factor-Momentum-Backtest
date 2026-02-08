@@ -13,9 +13,32 @@ def _ensure_flat_columns(df: pd.DataFrame) -> pd.DataFrame:
 def build_weights_topk_equal(mom_scores: pd.DataFrame,
                             daily_returns: pd.DataFrame,
                             top_k: int = 10) -> pd.DataFrame:
-    '''
+    """
+    Build a long-only Top-K equal-weight portfolio from momentum scores.
+
+    Concept:
+      - At each rebalance date (the dates in mom_scores), rank tickers by momentum.
+      - Select the Top-K tickers (highest scores).
+      - Assign equal weights to the selected tickers (1/K each; 0 for others).
+      - Hold these weights every day until the next rebalance date (forward-fill).
+      - Return a DAILY weights DataFrame aligned to daily_returns.index.
+
+    Inputs:
+      mom_scores:
+        DataFrame indexed by rebalance dates (typically month-end trading days),
+        columns = tickers, values = momentum scores (higher = better).
+      daily_returns:
+        DataFrame indexed by daily trading days,
+        columns = tickers, values = daily returns.
+      top_k:
+        Number of tickers to hold at each rebalance.
+
+    Output:
+      weights:
+        DataFrame indexed by daily trading days (same index as daily_returns),
+        columns = tickers, values = portfolio weights (long-only, sums to ~1 when invested).
+    """
     
-    '''
     mom_scores = _ensure_flat_columns(mom_scores).sort_index()
     daily_returns = _ensure_flat_columns(daily_returns).sort_index()
 
